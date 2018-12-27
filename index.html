@@ -62,6 +62,56 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-13.【树莓派】搭建FM发射器" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/27/13.【树莓派】搭建FM发射器/" class="article-date">
+  <time datetime="2018-12-27T02:44:08.909Z" itemprop="datePublished">2018-12-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="0x00"><a href="#0x00" class="headerlink" title="0x00"></a>0x00</h1><p><strong><em>未尽有关部门批准私人架设FM电台是违法的，轻则拘留重则判刑。本教程仅供实验、学习研究，切勿用作实际用途。</em></strong></p>
+<h1 id="0x01-安装"><a href="#0x01-安装" class="headerlink" title="0x01 安装"></a>0x01 安装</h1><p>安装依赖组件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt install libsndfile1-dev</span><br></pre></td></tr></table></figure>
+<p>检查是否有<code>rpi-mailbox</code>驱动，该驱动在2015年以后的Raspbian自带。</p>
+<p>下载并安装所需程序</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git clone https://github.com/ChristopheJacquet/PiFmRds.git</span><br><span class="line"></span><br><span class="line"><span class="meta">$</span> cd PiFmRds/src</span><br><span class="line"><span class="meta">$</span> make clean</span><br><span class="line"><span class="meta">$</span> make</span><br></pre></td></tr></table></figure>
+<h1 id="0x02-使用"><a href="#0x02-使用" class="headerlink" title="0x02 使用"></a>0x02 使用</h1><p>FM发射信号的发射天线定义在GPIO 4(pin 7)号针脚上，可以在此针脚连接杜邦线增强信号。</p>
+<h2 id="发射信号："><a href="#发射信号：" class="headerlink" title="发射信号："></a>发射信号：</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo ./pi_fm_rds -audio sound.wav</span><br></pre></td></tr></table></figure>
+<h2 id="运行pi-fm-rds的一般语法："><a href="#运行pi-fm-rds的一般语法：" class="headerlink" title="运行pi_fm_rds的一般语法："></a>运行pi_fm_rds的一般语法：</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pi_fm_rds [-freq 信号频率] [-audio 音频文件] [-ppm 振荡器误差] [-pi 广播代码] [-ps 电台名称] [-rt 传输无线电文本]</span><br></pre></td></tr></table></figure>
+<h2 id="参数介绍："><a href="#参数介绍：" class="headerlink" title="参数介绍："></a>参数介绍：</h2><ul>
+<li><code>-freq</code>指定载波频率（以MHz为单位）。示例：<code>-freq 107.9</code></li>
+<li><code>-audio</code>指定要作为音频播放的音频文件。采样率无关紧要：Pi-FM-RDS将重新采样并对其进行过滤。如果提供立体声文件，Pi-FM-RDS将产生FM立体声信号。示例：<code>-audio sound.wav</code>。支持的格式取决于<code>libsndfile</code>。这包括WAV和Ogg / Vorbis（以及其他），但不包括MP3。指定<code>-</code>作为文件名来读取标准输入上的音频数据（用于将音频传输到Pi-FM-RDS，见下文）。</li>
+<li><code>-pi</code>指定RDS广播的PI代码。4个十六进制数字。示例：<code>-pi FFFF</code>。</li>
+<li><code>-ps</code>指定RDS广播的电台名称（节目服务名称，PS）。限制：8个字符。示例：<code>-ps RASP-PI</code>。</li>
+<li><code>-rt</code>指定要传输的无线电文本（RT）。限制：64个字符。示例：<code>-rt &#39;Hello, world!&#39;</code>。</li>
+<li><code>-ctl</code> 指定一个命名管道（FIFO），用作控制通道，在运行时更改PS和RT（见下文）。</li>
+<li><code>-ppm</code> 以百万分率（ppm）表示您的Raspberry Pi振荡器误差，请参见下文。</li>
+</ul>
+<p>默认情况下，PS在<code>Pi-FmRds</code>序列号之间来回切换，从<code>00000000</code>开始。PS每秒变化一次。</p>
+<h2 id="高级发射音频："><a href="#高级发射音频：" class="headerlink" title="高级发射音频："></a>高级发射音频：</h2><p>如果使用参数<code>-audio -</code>，Pi-FM-RDS将读取标准输入的音频数据。这允许您将程序的输出传输到Pi-FM-RDS。例如，这可以用于使用Sox读取MP3文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sox -t mp3 http://www.linuxvoice.com/episodes/lv_s02e01.mp3 -t wav -  | sudo ./pi_fm_rds -audio -</span><br></pre></td></tr></table></figure>
+<p>或者将声卡的AUX输入传输到Pi-FM-RDS：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo arecord -fS16_LE -r 44100 -Dplughw:1,0 -c 2 -  | sudo ./pi_fm_rds -audio -</span><br></pre></td></tr></table></figure>
+<h1 id="0x03-END"><a href="#0x03-END" class="headerlink" title="0x03 END"></a>0x03 END</h1><p>其他问题请查看该<a href="https://github.com/ChristopheJacquet/PiFmRds" target="_blank" rel="noopener">项目说明文件</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/27/13.【树莓派】搭建FM发射器/" data-id="cjq609ouu0007agkzof0eo1zo" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-新的开始" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/12/27/新的开始/" class="article-date">
@@ -88,7 +138,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/27/新的开始/" data-id="cjq6007jc00008akzsod5dfe8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/27/新的开始/" data-id="cjq609ov0000cagkzobx86pg7" class="article-share-link">Share</a>
       
       
     </footer>
@@ -133,7 +183,434 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2018/12/27/hello-world/" data-id="cjq6007jn00018akzh0bd35m6" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2018/12/27/hello-world/" data-id="cjq609ouz000bagkz494r6dpd" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-12.【Linux】硬盘休眠" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/10/12.【Linux】硬盘休眠/" class="article-date">
+  <time datetime="2018-12-10T06:54:43.946Z" itemprop="datePublished">2018-12-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>本文转自：<a href="http://www.mkitby.com/2016/05/15/raspberry-pi-nas-manage-hdd-power/" target="_blank" rel="noopener">http://www.mkitby.com/2016/05/15/raspberry-pi-nas-manage-hdd-power/</a></p>
+<p>使用树莓派3b和一块旧式笔记本ide硬盘实验，发现hd-idle可行。</p>
+</blockquote>
+<p>为了延长硬盘使用寿命，当硬盘不使用时，需要让硬盘休眠，目前有一些软件可以自动做这事，像 hdparm, hd-idle 和 sdparm，具体用哪个取决于USB to SATA控制器和硬盘本身，其实说白了就是一个一个试，哪个有用就用哪个。当然，这里说的都是机械硬盘，固态硬盘没研究过。</p>
+<p>注意：不要让机械硬盘频繁地休眠唤醒，这样会给电机和轴承较大负荷，会加剧硬盘损耗. 一般制造商建议的最小休眠时间是 3-5 分钟。参考（<a href="http://hd-idle.sourceforge.net/%EF%BC%89" target="_blank" rel="noopener">http://hd-idle.sourceforge.net/）</a></p>
+<p>首先查看硬盘设备名，一般就是/dev/sda,dev/sdb之类的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo blkid</span><br></pre></td></tr></table></figure>
+<p>例如输出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/dev/mmcblk0p1: SEC_TYPE=&quot;msdos&quot; LABEL=&quot;boot&quot; UUID=&quot;15CD-3B79&quot; TYPE=&quot;vfat&quot;</span><br><span class="line">/dev/mmcblk0p2: UUID=&quot;13d368bf-6dbf-4751-8ba1-88bed06bef77&quot; TYPE=&quot;ext4&quot;</span><br><span class="line">/dev/sda1: UUID=&quot;7e623443-f19a-4564-8e60-e9d2170ac32a&quot; TYPE=&quot;ext4&quot;</span><br><span class="line">/dev/sdb1: LABEL=&quot;COLORSPACE&quot; UUID=&quot;F8E6-4FDB&quot; TYPE=&quot;vfat&quot;</span><br><span class="line">/dev/sdb2: UUID=&quot;3007-F316&quot; TYPE=&quot;exfat&quot;</span><br></pre></td></tr></table></figure>
+<p>硬盘设备名为/dev/sdb,硬盘有两个分区</p>
+<h1 id="安装和配置hdparm"><a href="#安装和配置hdparm" class="headerlink" title="安装和配置hdparm"></a>安装和配置hdparm</h1><p>先测试hdparm是否支持。</p>
+<p>安装 hdparm，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install hdparm -y</span><br></pre></td></tr></table></figure>
+<p>确保你的硬盘支持hdparm,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo hdparm -y /dev/sdb</span><br></pre></td></tr></table></figure>
+<p>如果输出如下结果，就表明支持，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/dev/sdb:</span><br><span class="line"> issuing standby command</span><br></pre></td></tr></table></figure>
+<p>如果看到类似如下输出，就表明不支持，可以跳到 hd-idle 或者 sdparm，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/dev/sda:</span><br><span class="line"> issuing standby command</span><br><span class="line">SG_IO: bad/missing sense data, sb[]:  70 00 05 00 00 00 00 0a 00 00 00 00 20 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</span><br></pre></td></tr></table></figure>
+<p>检查硬盘是否支持写缓存功能，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo hdparm -I /dev/sdb | grep &apos;Write cache&apos;</span><br></pre></td></tr></table></figure>
+<p>如果看到 * (星号)，表示支持，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*    Write cache</span><br></pre></td></tr></table></figure>
+<p>如果没有看到 * (星号)，表示不支持，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Write cache</span><br></pre></td></tr></table></figure>
+<p>编辑配置文件，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim /etc/hdparm.conf</span><br></pre></td></tr></table></figure>
+<p>spindown_time值乘以 5 得到总的时间（单位秒）. 例如想配置成空闲10分钟就休眠，spindown_time = 10 * 60 / 5 = 120</p>
+<p>在文件结尾加入，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/dev/sdb &#123;</span><br><span class="line">write_cache = on</span><br><span class="line">spindown_time = 120</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果不支持写缓存，去掉 write_cache = on。</p>
+<p>重启 hdparm 服务，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo service hdparm restart</span><br></pre></td></tr></table></figure>
+<p>更多hdparm配置可以参考这(<a href="http://www.linux-magazine.com/Online/Features/Tune-Your-Hard-Disk-with-hdparm" target="_blank" rel="noopener">http://www.linux-magazine.com/Online/Features/Tune-Your-Hard-Disk-with-hdparm</a>)</p>
+<h1 id="安装和配置-hd-idle"><a href="#安装和配置-hd-idle" class="headerlink" title="安装和配置 hd-idle"></a>安装和配置 hd-idle</h1><p>如果你的硬盘不支持 hdparm，或者就想试下hd-idle, 可以删除hdparm</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get remove hdparm -y</span><br></pre></td></tr></table></figure>
+<p>hd-idle 使用一个特殊的系统文件来检测磁盘活动, 如果没有这个文件，那么就不能使用hd-idle。输入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /proc/diskstats</span><br></pre></td></tr></table></figure>
+<p>应该会看到如下的输出, 如果提示找不到文件或目录，那就不支持hd-idle。</p>
+<p>8 16 sdb 5604 130363 146538 16780 1814 51838 429152 763380 0 18230 780150<br>8 17 sdb1 5075 130363 139418 15370 8 0 8 10 0 8680 15370<br>8 18 sdb2 512 0 6984 1290 1805 51838 429144 763360 0 9770 764650</p>
+<p>hd-idle的自己编译，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install build-essential fakeroot debhelper -y</span><br></pre></td></tr></table></figure>
+<p>获取源代码，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget http://sourceforge.net/projects/hd-idle/files/hd-idle-1.05.tgz</span><br></pre></td></tr></table></figure>
+<p>解压缩进入目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -xvf hd-idle-1.05.tgz &amp;&amp; cd hd-idle</span><br></pre></td></tr></table></figure>
+<p>编译安装，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dpkg-buildpackage -rfakeroot</span><br><span class="line">sudo dpkg -i ../hd-idle_*.deb</span><br></pre></td></tr></table></figure>
+<p>继续检查硬盘是否支持hd-idle,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo hd-idle -i 0 -a sda -i 300 -d</span><br></pre></td></tr></table></figure>
+<p>你会看到如下输出：</p>
+<p>probing sda: reads: 13418, writes: 594344<br>probing sdb: reads: 146538, writes: 429152</p>
+<p>按 Ctrl+C 停止 hd-idle</p>
+<p>编辑配置文件，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim /etc/default/hd-idle</span><br></pre></td></tr></table></figure>
+<p>修改下面来开启hd-idle</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">START_HD_IDLE=true</span><br></pre></td></tr></table></figure>
+<p>调整空闲时间为10分钟 (60 秒 * 10)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HD_IDLE_OPTS=&quot;-i 0 -a sda -i 600&quot;</span><br></pre></td></tr></table></figure>
+<p>重启服务，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo service hd-idle restart</span><br></pre></td></tr></table></figure>
+<p>如果hd-idle也不支持，可以试下 sdparm</p>
+<h1 id="安装和配置-sdparm"><a href="#安装和配置-sdparm" class="headerlink" title="安装和配置 sdparm"></a>安装和配置 sdparm</h1><p>首先删除 hdparm 和 hd-idle</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get remove hdparm -y</span><br><span class="line">sudo dpkg -r hd-idle</span><br></pre></td></tr></table></figure>
+<p>安装 sdparm</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install sdparm -y</span><br></pre></td></tr></table></figure>
+<p>测试sdparm是否支持，停止一切硬盘操作，输入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sydo sdparm --flexible --command=stop /dev/sdb</span><br></pre></td></tr></table></figure>
+<p>应该可以看到如下输出，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/dev/sdb: SANHO     IUSBPORT          0</span><br></pre></td></tr></table></figure>
+<p>如果需要每隔10分钟休眠硬盘，可以用如下crontab命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo crontab -l | &#123; cat; echo &quot;/10 * * * * sdparm --command=stop /dev/sda&quot;; &#125; | sudo crontab -</span><br></pre></td></tr></table></figure>
+<p>经过以上折腾，终于可以放心了，不用担心硬盘一天24小时不要命的转。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://sg.danny.cz/sg/sdparm.html" target="_blank" rel="noopener">http://sg.danny.cz/sg/sdparm.html</a><br><a href="http://www.nslu2-linux.org/wiki/FAQ/SpinDownUSBHarddisks" target="_blank" rel="noopener">http://www.nslu2-linux.org/wiki/FAQ/SpinDownUSBHarddisks</a><br><a href="http://hd-idle.sourceforge.net/" target="_blank" rel="noopener">http://hd-idle.sourceforge.net/</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/10/12.【Linux】硬盘休眠/" data-id="cjq609ouj0001agkz7dzd0gou" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-11.【Tensorflow】卷积神经网络图片风格转化" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/03/11.【Tensorflow】卷积神经网络图片风格转化/" class="article-date">
+  <time datetime="2018-12-03T09:23:53.045Z" itemprop="datePublished">2018-12-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="0x00"><a href="#0x00" class="headerlink" title="0x00"></a>0x00</h1><p>之前有一款火爆网络的图像风格转化软件 Prisma，它能将一张普通的图片转成各种艺术风格的图像。现在简单来了解一下背后的算法原理及使用Tensorflow实现一下。</p>
+<h1 id="0x01-原理简述"><a href="#0x01-原理简述" class="headerlink" title="0x01 原理简述"></a>0x01 原理简述</h1><p>2016 CVPR 一篇文章：” Image Style Transfer Using Convolutional Neural Networks”（<a href="https://blog.csdn.net/cicibabe/article/details/70885715" target="_blank" rel="noopener">文章翻译</a>） 提出了这种算法。</p>
+<p>算法流程图：</p>
+<p><img src="D:\documents\博客\image\11\1.png" alt=""></p>
+<p>简单地说就是使用一个训练好的卷积神经网络 VGG-19（19层VGG网络包含16个卷积层和5个池化层），而这个网络在<a href="http://www.image-net.org/" target="_blank" rel="noopener">ImageNet</a>上已经有训练好了的。</p>
+<p>假如现在有一张<strong>风格图像</strong>和一张<strong>普通图像</strong>，<strong>风格图像</strong>经过VGG-19 的时候在每个卷积层会得到很多 feature maps, 这些feature maps 组成一个<strong>集合 A</strong>，同样的，<strong>普通图像</strong> 通过 VGG-19 的时候也会得到很多 feature maps，这些feature maps 组成一个<strong>集合 B</strong> ，然后生成一张<strong>随机噪声图像</strong> ,同样 <strong>随机噪声图像</strong> 通过VGG-19 的时候也会生成很多feature maps，这些 feature maps 构成<strong>集合 C</strong> ,最终的优化函数是希望调整 <strong>C</strong> 让 <strong>随机噪声图像</strong> 最后既保持<strong>普通图像</strong> 的内容, 又有一定的<strong>风格图像</strong>的风格。</p>
+<p><img src="D:\documents\博客\image\11\2.png" alt=""></p>
+<p>想要了解更多请阅读原文 “ Image Style Transfer Using Convolutional Neural Networks”（<a href="https://blog.csdn.net/cicibabe/article/details/70885715" target="_blank" rel="noopener">文章翻译</a>）</p>
+<h1 id="0x02-实现"><a href="#0x02-实现" class="headerlink" title="0x02 实现"></a>0x02 实现</h1><p>较好的实现项目：</p>
+<ol>
+<li><a href="https://github.com/anishathalye/neural-style" target="_blank" rel="noopener">neural-style</a> *需要性能较好的计算机。512 x 512分辨率的图片使用不同硬件进行1000次迭代性能对比：<ol>
+<li>GTX 1080                          ~60s</li>
+<li>Maxwell Titan X               ~90s</li>
+<li>Intel Core i7-5930K         ~1h</li>
+</ol>
+</li>
+<li><a href="https://github.com/Rehtt/fast-neural-style-tensorflow" target="_blank" rel="noopener">fast-neural-style-tensorflow</a> *可以使用预训练模型或自己训练模型，使用预训练的模型在性能较低的计算机上也能较好地实现。</li>
+</ol>
+<p>这里使用预训练模型。</p>
+<p>Tensorflow安装</p>
+<p>克隆项目：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/Rehtt/fast-neural-style-tensorflow.git</span><br></pre></td></tr></table></figure>
+<p>运行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#图像</span><br><span class="line">python eval.py --model_file &lt;wave.ckpt-done模型的路径&gt; --image_file img/test.jpg</span><br><span class="line"></span><br><span class="line">#视频</span><br><span class="line">python video.py --model_file &lt;wave.ckpt-done模型的路径&gt; --video_file video/test.mp4 --out_video_file video/video.mp4</span><br></pre></td></tr></table></figure>
+<p>详情及训练模型请阅读<a href="https://github.com/Rehtt/fast-neural-style-tensorflow/blob/master/README.md" target="_blank" rel="noopener">说明</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/03/11.【Tensorflow】卷积神经网络图片风格转化/" data-id="cjq609oum0002agkzdg2nndut" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-9.【树莓派】树莓派+aria2 搭建远程下载机" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/11/25/9.【树莓派】树莓派+aria2 搭建远程下载机/" class="article-date">
+  <time datetime="2018-11-25T09:28:32.313Z" itemprop="datePublished">2018-11-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="0x00"><a href="#0x00" class="headerlink" title="0x00"></a>0x00</h1><p>之前采用的是迅雷+树莓派的方案搭建远程下载机，但是现在迅雷远程下载总是出现问题加上迅雷已经停止维护第三方下载机的程序(╯°Д°)╯︵┻━┻，不过劳动人民的智慧是无穷的(๑＞︶＜)و，在这里采用树莓派+aria2来搭建下载机使用云服务器使用frp内网穿透转发来实现远程控制。</p>
+<p>环境：树莓派3B、Raspbian </p>
+<p>软件：aria2（下载器）、frp（内网穿透）</p>
+<h1 id="0x01-搭建下载环境"><a href="#0x01-搭建下载环境" class="headerlink" title="0x01 搭建下载环境"></a>0x01 搭建下载环境</h1><h2 id="1-aria2安装"><a href="#1-aria2安装" class="headerlink" title="1.aria2安装"></a>1.aria2安装</h2><p>Aria2是一款免费开源跨平台且不限速的多线程下载软件，Aria2的优点是速度快、体积小、资源占用少。</p>
+<p>在树莓派官方系统Raspbian及大多数系统中是支持直接安装的，在其他系统中就有可能需要<a href="https://github.com/aria2/aria2" target="_blank" rel="noopener">编译安装</a>。</p>
+<p>这里主要使用直接安装，在终端输入</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt update &amp;&amp; sudo apt upgrade -y</span><br><span class="line"><span class="meta">$</span> sudo apt install aria2 -y</span><br></pre></td></tr></table></figure>
+<h2 id="2-aria2配置"><a href="#2-aria2配置" class="headerlink" title="2.aria2配置"></a>2.aria2配置</h2><p>先创建配置文件夹和创建相关文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> mkdir ~/.config/aria2</span><br><span class="line"><span class="meta">$</span> touch ~/.config/aria2/aria2.conf</span><br><span class="line"><span class="meta">$</span> touch ~/.config/aria2/aria2.session</span><br></pre></td></tr></table></figure>
+<p>编写简单配置文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> nano ~/.config/aria2/aria2.conf</span><br><span class="line"></span><br><span class="line">aria2.conf 内容：</span><br><span class="line"><span class="meta">#</span>启用RPC远程连接, 默认:false</span><br><span class="line">enable-rpc=true</span><br><span class="line"><span class="meta">#</span>允许所有来源, 默认:false</span><br><span class="line">rpc-allow-origin-all=true</span><br><span class="line"><span class="meta">#</span>允许非外部访问, 默认:false</span><br><span class="line">rpc-listen-all=true</span><br><span class="line"><span class="meta">#</span>RPC监听端口, 端口被占用时可以修改, 默认:6800</span><br><span class="line">rpc-listen-port=6800</span><br><span class="line"><span class="meta">#</span>设置的RPC授权令牌, v1.18.4新增功能, 取代 --rpc-user 和 --rpc-passwd 选项。建议在远程连接下载启用保障安全</span><br><span class="line">rpc-secret=123456</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>从会话文件中读取下载任务</span><br><span class="line">input-file=/etc/aria2/aria2.session</span><br><span class="line"><span class="meta">#</span>在Aria2退出时保存`错误/未完成`的下载任务到会话文件</span><br><span class="line">save-session=/etc/aria2/aria2.session</span><br><span class="line"><span class="meta">#</span>定时保存会话, 0为退出时才保存, 需1.16.1以上版本, 默认:0</span><br><span class="line">save-session-interval=60</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>下载文件保存地址</span><br><span class="line">dir=~/downloads</span><br><span class="line"><span class="meta">#</span>断点续传</span><br><span class="line">continue=true</span><br><span class="line"><span class="meta">#</span>文件预分配，减少碎片文件，默认：prealloc</span><br><span class="line"><span class="meta">#</span>预分配所需时间: none &lt; falloc ? trunc &lt; prealloc</span><br><span class="line"><span class="meta">#</span>树莓派Raspbian是Linux系统采用EXT3/4文件系统，所以使用trunc</span><br><span class="line">file-allocation=trunc</span><br></pre></td></tr></table></figure>
+<p>可以在配置文件中选择添加bt下载服务器，<a href="https://github.com/ngosang/trackerslist" target="_blank" rel="noopener">服务器列表</a>：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bt-tracker=（服务器地址以","分隔）</span><br></pre></td></tr></table></figure>
+<p>如果需要添加其他参数请阅读<a href="https://aria2.github.io/manual/en/html/index.html" target="_blank" rel="noopener">Aria2官方文档</a>及善于搜索（求人不如求己(～￣▽￣)～ ）</p>
+<h1 id="0x02-配置远程下载及界面"><a href="#0x02-配置远程下载及界面" class="headerlink" title="0x02 配置远程下载及界面"></a>0x02 配置远程下载及界面</h1><h2 id="1-配置远程下载"><a href="#1-配置远程下载" class="headerlink" title="1.配置远程下载"></a>1.配置远程下载</h2><p>这里使用frp转发来实现内网穿透（需要有云服务器做中转），如果有公网ip就不需要，公网ip一般只有企业宽带才可能有，或者也可以打电话到宽带运营商开通（可以上网学习一下网友打电话开通的各种骚操作ヽ(￣▽￣)ﾉ）</p>
+<p>使用frp主要转发aria2的rpc端口。</p>
+<p><a href="https://blog.rehtt.com/article/frp%E5%86%85%E7%BD%91%E7%A9%BF%E9%80%8F/" target="_blank" rel="noopener">参考frp教程</a></p>
+<h2 id="2-配置界面"><a href="#2-配置界面" class="headerlink" title="2.配置界面"></a>2.配置界面</h2><p>由于aria2是没有图像界面的所以这里使用的是web网页界面<a href="https://github.com/ziahamza/webui-aria2" target="_blank" rel="noopener">webui-aria2</a>，可以使用在线的网页需要填入树莓派地址、端口、令牌（可选），也可以将此网页界面下载到本地使用。</p>
+<p>在本地电脑或树莓派或云服务器上下载webui-aria2</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> git clone https://github.com/ziahamza/webui-aria2.git</span><br></pre></td></tr></table></figure>
+<p>进入其中的docs目录修改文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> cd webui-aria2/docs</span><br><span class="line"><span class="meta">$</span> nano ./app.js</span><br><span class="line"></span><br><span class="line">点击键盘ctrl+w搜索"location.hostname:"，修改</span><br><span class="line">" location.hostname：树莓派所在的ip或网址 "</span><br><span class="line">" port: aria2的rpc端口 "</span><br><span class="line"></span><br><span class="line">搜索找到" (c = p &amp;&amp; p.auth &amp;&amp; p.auth.token ? p.auth.token : null),"，并将这行修改为" (c="你配置rpc-secret的值") "</span><br></pre></td></tr></table></figure>
+<h1 id="0x03-END"><a href="#0x03-END" class="headerlink" title="0x03 END"></a>0x03 END</h1>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/11/25/9.【树莓派】树莓派+aria2 搭建远程下载机/" data-id="cjq609oux000aagkz8sl9r6s3" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-10.【已发布】frp内网穿透" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/11/25/10.【已发布】frp内网穿透/" class="article-date">
+  <time datetime="2018-11-25T09:22:20.588Z" itemprop="datePublished">2018-11-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="0x00"><a href="#0x00" class="headerlink" title="0x00"></a>0x00</h1><p>frp是一款使用go语言开发开源的内网穿透反向代理应用，通过一台拥有公网ip的服务器来转发没有公网ip服务器的端口实现反向代理，支持 tcp, udp, http, https 协议。</p>
+<p><img src="D:\documents\博客\image\10\1.jpg" alt="1"></p>
+<p><img src="https://github.com/fatedier/frp/raw/master/doc/pic/architecture.png" alt="frp架构"></p>
+<h1 id="0x01-下载及配置"><a href="#0x01-下载及配置" class="headerlink" title="0x01 下载及配置"></a>0x01 下载及配置</h1><h2 id="1-下载"><a href="#1-下载" class="headerlink" title="1.下载"></a>1.下载</h2><p>应用作者已经编译好各平台的应用，只需找到相应平台的版本即可。</p>
+<p>例如树莓派的cpu平台是arm的，所以选择下载<code>linux_arm</code></p>
+<p>常见设备版本：</p>
+<p><code>linux_amd64</code>    linux 64位版</p>
+<p><code>linux_386</code>        linux 32位版</p>
+<p><code>windows_amd64</code>    windows 64位版</p>
+<p><code>windows_386</code>    windows 32位版</p>
+<p><code>darwin_amd64</code>    mac系统版</p>
+<p><a href="https://github.com/fatedier/frp/releases" target="_blank" rel="noopener">下载地址</a></p>
+<h2 id="2-配置"><a href="#2-配置" class="headerlink" title="2.配置"></a>2.配置</h2><p>简单配置：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">公网ip端使用frps和frps.ini</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>frps.ini</span><br><span class="line"><span class="meta">#</span>必填</span><br><span class="line">[common]</span><br><span class="line"><span class="meta">#</span>连接端口，自义定不要端口冲突就好</span><br><span class="line">bind_port=7000</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">内网端使用frpc和frpc.ini</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>frpc.ini</span><br><span class="line"><span class="meta">#</span>必填</span><br><span class="line">[common]</span><br><span class="line"><span class="meta">#</span>公网ip机器的ip或网址</span><br><span class="line">server_addr=x.x.x.x</span><br><span class="line"><span class="meta">#</span>公网ip机器的连接端口，必须和公网机器一致</span><br><span class="line">server_port=7000</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>名字自义定</span><br><span class="line">[test]</span><br><span class="line"><span class="meta">#</span>协议类型</span><br><span class="line">type=tcp</span><br><span class="line"><span class="meta">#</span>要转发的本地ip</span><br><span class="line">local_ip=127.0.0.1</span><br><span class="line"><span class="meta">#</span>要转发的本地端口</span><br><span class="line">local_port=1234</span><br><span class="line"><span class="meta">#</span>公网机器转发端口，自义定不要与公网机器端口冲突就好</span><br><span class="line">remote_port=6000</span><br></pre></td></tr></table></figure>
+<p>启动：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">公网机器：</span><br><span class="line"><span class="meta">$</span> ./frps -c ./frps.ini</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">内网机器：</span><br><span class="line"><span class="meta">$</span> ./frpc -c ./frpc.ini</span><br></pre></td></tr></table></figure>
+<h1 id="0x02-END"><a href="#0x02-END" class="headerlink" title="0x02 END"></a>0x02 END</h1><p>其他详情请查阅<a href="https://github.com/fatedier/frp/blob/master/README_zh.md" target="_blank" rel="noopener">官方配置说明</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/11/25/10.【已发布】frp内网穿透/" data-id="cjq609oun0003agkzg3idwivf" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-8.【免杀】通过修改特征码实现杀毒软件免杀" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/10/17/8.【免杀】通过修改特征码实现杀毒软件免杀/" class="article-date">
+  <time datetime="2018-10-17T03:04:49.785Z" itemprop="datePublished">2018-10-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h1><p>前几天写的一个程序被火绒误报毒了不开森(╬￣皿￣)，不过劳动人民的智慧是无穷的(๑＞︶＜)و，通过修改软件特征码就可以绕过杀毒软件的检测。</p>
+<p>使用工具：myccl（将文件分块找查具体报毒的特征码所在的位置），c32asm（修改文件特征码，用其他的16进制/汇编修改工具也可以）</p>
+<h1 id="0x01-查找具体特征码"><a href="#0x01-查找具体特征码" class="headerlink" title="0x01 查找具体特征码"></a>0x01 查找具体特征码</h1><p>1.打开myccl加载报毒文件，先将文件分块20份</p>
+<p><img src="D:\documents\博客\image\8\Lily_Screenshot_1539742852.png" alt=""></p>
+<p>2.点击“生成”，找到分块的目录使用杀毒软件查杀文件</p>
+<p><img src="D:\documents\博客\image\8\Lily_Screenshot_1539742992.png" alt=""></p>
+<p>3.将报毒的文件删除，回到myccl点击“二次处理”</p>
+<p>4.循环“查杀病毒”&gt;“二次处理”，一直到没报毒为止，这样做是为了缩小特征码范围</p>
+<p>5.随后会定位到特征码范围</p>
+<p><img src="D:\documents\博客\image\8\Lily_Screenshot_1539743989.png" alt=""></p>
+<p>但是特征码物理长度太大，所以还要进一步定位</p>
+<p>6.点击“特征区间”，选中右键“复合定位此处特征”，随后可以看到被重新分块且长度为2</p>
+<p>7.点击“生成”，随后重复第4步，最后找到长度为2的特征码</p>
+<p><img src="D:\documents\博客\image\8\Lily_Screenshot_1539744377.png" alt=""></p>
+<p>其中物理地址就是我们要找的特征码</p>
+<h1 id="0x02-修改特征码"><a href="#0x02-修改特征码" class="headerlink" title="0x02 修改特征码"></a>0x02 修改特征码</h1><p>打开c32asm，以16进制打开文件</p>
+<p>1.右键“跳到”，输入刚刚定位的物理地址</p>
+<p><img src="D:\documents\博客\image\8\Lily_Screenshot_1539744661.png" alt=""></p>
+<p>2.右键“对应汇编模式编辑”</p>
+<p><img src="D:\documents\博客\image\8\Lily_Screenshot_1539744905.png" alt=""></p>
+<p>3.我这16进制对应的汇编指令是“ADD”（根据自己实际情况而定），将它替换对应的“等价汇编指令”（上百度google一下），“ADD”对应的是“ADC”</p>
+<p>4.右键“汇编”，输入相应的“等价汇编指令”</p>
+<p><img src="D:\documents\博客\image\8\Lily_Screenshot_1539744948.png" alt=""></p>
+<p>5.点击“汇编”，“退出”</p>
+<p>6.保存文件即可</p>
+<h1 id="0x03-END"><a href="#0x03-END" class="headerlink" title="0x03 END"></a>0x03 END</h1><p>用杀毒软件扫描没有报毒就修改成功</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/10/17/8.【免杀】通过修改特征码实现杀毒软件免杀/" data-id="cjq609ov3000eagkzbzia3o47" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-7.【C++】修改注册表管理开机启动项" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/10/16/7.【C++】修改注册表管理开机启动项/" class="article-date">
+  <time datetime="2018-10-16T12:50:52.938Z" itemprop="datePublished">2018-10-16</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 程序开机自动启动</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">autostart</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    HKEY hKey;</span><br><span class="line">    QString strRegPath = <span class="string">"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//1、找到系统的启动项  </span></span><br><span class="line">    <span class="keyword">if</span> (RegOpenKeyEx(HKEY_CURRENT_USER, strRegPath.toStdString().c_str(), <span class="number">0</span>, KEY_ALL_ACCESS, &amp;hKey) == ERROR_SUCCESS) <span class="comment">///打开启动项       </span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//2、得到本程序自身的全路径</span></span><br><span class="line">        TCHAR strExeFullDir[MAX_PATH];</span><br><span class="line">        GetModuleFileName(<span class="literal">NULL</span>, strExeFullDir, MAX_PATH);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3、判断注册表项是否已经存在</span></span><br><span class="line">        TCHAR strDir[MAX_PATH] = &#123;&#125;;</span><br><span class="line">        DWORD nLength = MAX_PATH;</span><br><span class="line">        <span class="keyword">long</span> result = RegGetValue(hKey, <span class="literal">nullptr</span>, <span class="string">"GISRestart"</span>, RRF_RT_REG_SZ, <span class="number">0</span>, strDir, &amp;nLength); <span class="comment">///"GISRestart"是应用程序名字</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">//4、已经存在</span></span><br><span class="line">        <span class="keyword">if</span> (result != ERROR_SUCCESS || _tcscmp(strExeFullDir, strDir) != <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//5、添加一个子Key,并设置值，"GISRestart"是应用程序名字（不加后缀.exe） </span></span><br><span class="line">            RegSetValueEx(hKey, <span class="string">"GISRestart"</span>, <span class="number">0</span>, REG_SZ, (LPBYTE)strExeFullDir, (lstrlen(strExeFullDir) + <span class="number">1</span>)*<span class="keyword">sizeof</span>(TCHAR));</span><br><span class="line"></span><br><span class="line">            <span class="comment">//6、关闭注册表</span></span><br><span class="line">            RegCloseKey(hKey);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        MessageBox(<span class="literal">NULL</span>, <span class="string">"设置失败"</span>, <span class="string">"error"</span>, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 取消开机自动启动</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">cancelAutoStart</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    HKEY hKey;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span>* strRegPath = <span class="string">"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//1、找到系统的启动项  </span></span><br><span class="line">    <span class="keyword">if</span> (RegOpenKeyEx(HKEY_CURRENT_USER, strRegPath, <span class="number">0</span>, KEY_ALL_ACCESS, &amp;hKey) == ERROR_SUCCESS)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//2、删除值</span></span><br><span class="line">        RegDeleteValue(hKey, <span class="string">"GISRestart"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//3、关闭注册表</span></span><br><span class="line">        RegCloseKey(hKey);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/10/16/7.【C++】修改注册表管理开机启动项/" data-id="cjq609ouw0009agkzddilbjwx" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-6.【人工智能】TensorFlow Windows安装" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/10/07/6.【人工智能】TensorFlow Windows安装/" class="article-date">
+  <time datetime="2018-10-07T09:18:07.042Z" itemprop="datePublished">2018-10-07</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="0x00-TensorFlow环境搭建"><a href="#0x00-TensorFlow环境搭建" class="headerlink" title="0x00 TensorFlow环境搭建"></a>0x00 TensorFlow环境搭建</h1><blockquote>
+<p>本教程引用 <a href="https://www.tensorflow.org/install/install_windows" target="_blank" rel="noopener">https://www.tensorflow.org/install/install_windows</a></p>
+</blockquote>
+<ul>
+<li>仅支持CPU。如果您的系统没有 NVIDIA® GPU，则必须安装此版本。请注意，此版本的 TensorFlow 通常更容易安装（用时通常在 5 或 10 分钟内），所以即使您拥有 NVIDIA GPU，我们也建议先安装此版本。预编译的二进制文件将使用 AVX 指令。</li>
+<li>支持GPU。TensorFlow 程序在 GPU 上的运行速度通常要比在 CPU 上快得多。因此，如果您的系统配有满足以下所示先决条件的 NVIDIA® GPU，并且您需要运行性能至关重要的应用，则最终应安装此版本。</li>
+</ul>
+<h2 id="GPU版本环境搭建"><a href="#GPU版本环境搭建" class="headerlink" title="GPU版本环境搭建"></a>GPU版本环境搭建</h2><p><strong>GPU版本要求使用NVIDIA GPU卡，并且CUDA计算能力在3.0及以上</strong>。CUDA 计算能力为3.0或更高的卡需要从源码编译安装TensorFlow 。计算能力为3.5或更高的卡可以使用编译好的二进制文件安装TensorFlow （使用pip安装.whl）。</p>
+<p>当前为TensorFlow-gpu 1.11.0的环境要求，必须按照要求的版本安装，若版本高于或低于要求都有可能出现错误。</p>
+<ul>
+<li><a href="https://developer.nvidia.com/cuda-90-download-archive?target_os=Windows&amp;target_arch=x86_64&amp;target_version=10&amp;target_type=exelocal" target="_blank" rel="noopener">CUDA Toolkit 9.0</a> </li>
+<li><a href="https://developer.nvidia.com/rdp/cudnn-archive#a-collapse705-9" target="_blank" rel="noopener">cuDNN v7.0</a>  下载完后解压，将内部的三个文件夹复制到CUDA Toolkit 的安装目录下</li>
+</ul>
+<p>注意：cuDNN 版本必须完全匹配：如果无法找到 <code>cuDNN64_7.dll</code>，TensorFlow 就不会加载。要使用不同版本的 cuDNN，必须从源代码构建。</p>
+<h1 id="0x01-TensorFlow安装"><a href="#0x01-TensorFlow安装" class="headerlink" title="0x01 TensorFlow安装"></a>0x01 TensorFlow安装</h1><h2 id="使用pip安装"><a href="#使用pip安装" class="headerlink" title="使用pip安装"></a>使用pip安装</h2><p>支持的python版本：3.5    3.6</p>
+<p>CPU版本安装：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip3 install tensorflow</span><br></pre></td></tr></table></figure>
+<p>GPU版本安装：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip3 install tensorflow-gpu</span><br></pre></td></tr></table></figure>
+<h2 id="使用Anaconda安装"><a href="#使用Anaconda安装" class="headerlink" title="使用Anaconda安装"></a>使用Anaconda安装</h2><ol>
+<li><p>通过调用以下命令创建名为 <code>tensorflow</code> 的 conda 环境：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:&gt; conda create -n tensorflow pip python=3.5</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过发出以下命令激活 conda 环境：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">C:&gt; activate tensorflow</span><br><span class="line"> (tensorflow)C:&gt;  # Your prompt should change</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>发出相应命令以在 conda 环境中安装 TensorFlow。要安装仅支持 CPU 的 TensorFlow 版本，请输入以下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(tensorflow)C:&gt; pip install --ignore-installed --upgrade tensorflow</span><br></pre></td></tr></table></figure>
+<p>要安装 GPU 版本的 TensorFlow，请输入以下命令（在同一行）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(tensorflow)C:&gt; pip install --ignore-installed --upgrade tensorflow-gpu</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="验证安装是否成功"><a href="#验证安装是否成功" class="headerlink" title="验证安装是否成功"></a>验证安装是否成功</h2><p>进入Python环境</p>
+<p>输入：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>hello = tf.constant(<span class="string">'Hello, TensorFlow!'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>sess = tf.Session()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(sess.run(hello))</span><br></pre></td></tr></table></figure>
+<p>若输出以下内容就说明安装成功：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Hello, TensorFlow!</span><br></pre></td></tr></table></figure>
+<p>如果系统输出一条错误消息而不是问候语，请参阅 常见的安装问题</p>
+<h2 id="常见的安装问题"><a href="#常见的安装问题" class="headerlink" title="常见的安装问题"></a>常见的安装问题</h2><p>我们借助 Stack Overflow 来记录 TensorFlow 安装问题及其补救措施。下表包含了 Stack Overflow 上一些常见安装问题解答的链接。如果您遇到了下表中未列出的错误消息或其他安装问题，请在 Stack Overflow 上进行搜索。如果 Stack Overflow 中没有显示相关错误消息，请在 Stack Overflow 上提一个新的问题，并指定 <code>tensorflow</code> 标签。</p>
+<table>
+<thead>
+<tr>
+<th>Stack Overflow 链接</th>
+<th>错误消息</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://stackoverflow.com/q/41007279" target="_blank" rel="noopener">41007279</a></td>
+<td><code>[...\stream_executor\dso_loader.cc] Couldn&#39;t open CUDA library nvcuda.dll</code></td>
+</tr>
+<tr>
+<td><a href="https://stackoverflow.com/q/41007279" target="_blank" rel="noopener">41007279</a></td>
+<td><code>[...\stream_executor\cuda\cuda_dnn.cc] Unable to load cuDNN DSO</code></td>
+</tr>
+<tr>
+<td><a href="http://stackoverflow.com/q/42006320" target="_blank" rel="noopener">42006320</a></td>
+<td><code>ImportError: Traceback (most recent call last): File &quot;...\tensorflow\core\framework\graph_pb2.py&quot;, line 6, in  from google.protobuf import descriptor as _descriptor ImportError: cannot import name &#39;descriptor&#39;</code></td>
+</tr>
+<tr>
+<td><a href="https://stackoverflow.com/q/42011070" target="_blank" rel="noopener">42011070</a></td>
+<td><code>No module named &quot;pywrap_tensorflow&quot;</code></td>
+</tr>
+<tr>
+<td><a href="https://stackoverflow.com/q/42217532" target="_blank" rel="noopener">42217532</a></td>
+<td><code>OpKernel (&#39;op: &quot;BestSplits&quot; device_type: &quot;CPU&quot;&#39;) for unknown op: BestSplits</code></td>
+</tr>
+<tr>
+<td><a href="https://stackoverflow.com/q/43134753" target="_blank" rel="noopener">43134753</a></td>
+<td><code>The TensorFlow library wasn&#39;t compiled to use SSE instructions</code></td>
+</tr>
+<tr>
+<td><a href="https://stackoverflow.com/q/38896424" target="_blank" rel="noopener">38896424</a></td>
+<td><code>Could not find a version that satisfies the requirement tensorflow</code></td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/10/07/6.【人工智能】TensorFlow Windows安装/" data-id="cjq609ouv0008agkzvydp248f" class="article-share-link">Share</a>
       
       
     </footer>
@@ -144,6 +621,11 @@
 
   
 
+
+  <nav id="page-nav">
+    
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+  </nav>
 
 </section>
         
@@ -161,7 +643,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li></ul>
     </div>
   </div>
 
@@ -174,11 +656,23 @@
       <ul>
         
           <li>
+            <a href="/2018/12/27/13.【树莓派】搭建FM发射器/">(no title)</a>
+          </li>
+        
+          <li>
             <a href="/2018/12/27/新的开始/">新的开始</a>
           </li>
         
           <li>
             <a href="/2018/12/27/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/10/12.【Linux】硬盘休眠/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/03/11.【Tensorflow】卷积神经网络图片风格转化/">(no title)</a>
           </li>
         
       </ul>

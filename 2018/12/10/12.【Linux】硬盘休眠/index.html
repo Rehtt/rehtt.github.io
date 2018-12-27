@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="本文转自：http://www.mkitby.com/2016/05/15/raspberry-pi-nas-manage-hdd-power/ 使用树莓派3b和一块旧式笔记本ide硬盘实验，发现hd-idle可行。  为了延长硬盘使用寿命，当硬盘不使用时，需要让硬盘休眠，目前有一些软件可以自动做这事，像 hdparm, hd-idle 和 sdparm，具体用哪个取决于USB to SATA控">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://yoursite.com/2018/12/10/12.【Linux】硬盘休眠/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="本文转自：http://www.mkitby.com/2016/05/15/raspberry-pi-nas-manage-hdd-power/ 使用树莓派3b和一块旧式笔记本ide硬盘实验，发现hd-idle可行。  为了延长硬盘使用寿命，当硬盘不使用时，需要让硬盘休眠，目前有一些软件可以自动做这事，像 hdparm, hd-idle 和 sdparm，具体用哪个取决于USB to SATA控">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-12-10T06:54:27.675Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo">
+<meta name="twitter:description" content="本文转自：http://www.mkitby.com/2016/05/15/raspberry-pi-nas-manage-hdd-power/ 使用树莓派3b和一块旧式笔记本ide硬盘实验，发现hd-idle可行。  为了延长硬盘使用寿命，当硬盘不使用时，需要让硬盘休眠，目前有一些软件可以自动做这事，像 hdparm, hd-idle 和 sdparm，具体用哪个取决于USB to SATA控">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-12.【Linux】硬盘休眠" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/12/10/12.【Linux】硬盘休眠/" class="article-date">
+  <time datetime="2018-12-10T06:54:43.946Z" itemprop="datePublished">2018-12-10</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>本文转自：<a href="http://www.mkitby.com/2016/05/15/raspberry-pi-nas-manage-hdd-power/" target="_blank" rel="noopener">http://www.mkitby.com/2016/05/15/raspberry-pi-nas-manage-hdd-power/</a></p>
+<p>使用树莓派3b和一块旧式笔记本ide硬盘实验，发现hd-idle可行。</p>
+</blockquote>
+<p>为了延长硬盘使用寿命，当硬盘不使用时，需要让硬盘休眠，目前有一些软件可以自动做这事，像 hdparm, hd-idle 和 sdparm，具体用哪个取决于USB to SATA控制器和硬盘本身，其实说白了就是一个一个试，哪个有用就用哪个。当然，这里说的都是机械硬盘，固态硬盘没研究过。</p>
+<p>注意：不要让机械硬盘频繁地休眠唤醒，这样会给电机和轴承较大负荷，会加剧硬盘损耗. 一般制造商建议的最小休眠时间是 3-5 分钟。参考（<a href="http://hd-idle.sourceforge.net/%EF%BC%89" target="_blank" rel="noopener">http://hd-idle.sourceforge.net/）</a></p>
+<p>首先查看硬盘设备名，一般就是/dev/sda,dev/sdb之类的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo blkid</span><br></pre></td></tr></table></figure>
+<p>例如输出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/dev/mmcblk0p1: SEC_TYPE=&quot;msdos&quot; LABEL=&quot;boot&quot; UUID=&quot;15CD-3B79&quot; TYPE=&quot;vfat&quot;</span><br><span class="line">/dev/mmcblk0p2: UUID=&quot;13d368bf-6dbf-4751-8ba1-88bed06bef77&quot; TYPE=&quot;ext4&quot;</span><br><span class="line">/dev/sda1: UUID=&quot;7e623443-f19a-4564-8e60-e9d2170ac32a&quot; TYPE=&quot;ext4&quot;</span><br><span class="line">/dev/sdb1: LABEL=&quot;COLORSPACE&quot; UUID=&quot;F8E6-4FDB&quot; TYPE=&quot;vfat&quot;</span><br><span class="line">/dev/sdb2: UUID=&quot;3007-F316&quot; TYPE=&quot;exfat&quot;</span><br></pre></td></tr></table></figure>
+<p>硬盘设备名为/dev/sdb,硬盘有两个分区</p>
+<h1 id="安装和配置hdparm"><a href="#安装和配置hdparm" class="headerlink" title="安装和配置hdparm"></a>安装和配置hdparm</h1><p>先测试hdparm是否支持。</p>
+<p>安装 hdparm，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install hdparm -y</span><br></pre></td></tr></table></figure>
+<p>确保你的硬盘支持hdparm,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo hdparm -y /dev/sdb</span><br></pre></td></tr></table></figure>
+<p>如果输出如下结果，就表明支持，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/dev/sdb:</span><br><span class="line"> issuing standby command</span><br></pre></td></tr></table></figure>
+<p>如果看到类似如下输出，就表明不支持，可以跳到 hd-idle 或者 sdparm，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/dev/sda:</span><br><span class="line"> issuing standby command</span><br><span class="line">SG_IO: bad/missing sense data, sb[]:  70 00 05 00 00 00 00 0a 00 00 00 00 20 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</span><br></pre></td></tr></table></figure>
+<p>检查硬盘是否支持写缓存功能，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo hdparm -I /dev/sdb | grep &apos;Write cache&apos;</span><br></pre></td></tr></table></figure>
+<p>如果看到 * (星号)，表示支持，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*    Write cache</span><br></pre></td></tr></table></figure>
+<p>如果没有看到 * (星号)，表示不支持，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Write cache</span><br></pre></td></tr></table></figure>
+<p>编辑配置文件，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim /etc/hdparm.conf</span><br></pre></td></tr></table></figure>
+<p>spindown_time值乘以 5 得到总的时间（单位秒）. 例如想配置成空闲10分钟就休眠，spindown_time = 10 * 60 / 5 = 120</p>
+<p>在文件结尾加入，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/dev/sdb &#123;</span><br><span class="line">write_cache = on</span><br><span class="line">spindown_time = 120</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果不支持写缓存，去掉 write_cache = on。</p>
+<p>重启 hdparm 服务，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo service hdparm restart</span><br></pre></td></tr></table></figure>
+<p>更多hdparm配置可以参考这(<a href="http://www.linux-magazine.com/Online/Features/Tune-Your-Hard-Disk-with-hdparm" target="_blank" rel="noopener">http://www.linux-magazine.com/Online/Features/Tune-Your-Hard-Disk-with-hdparm</a>)</p>
+<h1 id="安装和配置-hd-idle"><a href="#安装和配置-hd-idle" class="headerlink" title="安装和配置 hd-idle"></a>安装和配置 hd-idle</h1><p>如果你的硬盘不支持 hdparm，或者就想试下hd-idle, 可以删除hdparm</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get remove hdparm -y</span><br></pre></td></tr></table></figure>
+<p>hd-idle 使用一个特殊的系统文件来检测磁盘活动, 如果没有这个文件，那么就不能使用hd-idle。输入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /proc/diskstats</span><br></pre></td></tr></table></figure>
+<p>应该会看到如下的输出, 如果提示找不到文件或目录，那就不支持hd-idle。</p>
+<p>8 16 sdb 5604 130363 146538 16780 1814 51838 429152 763380 0 18230 780150<br>8 17 sdb1 5075 130363 139418 15370 8 0 8 10 0 8680 15370<br>8 18 sdb2 512 0 6984 1290 1805 51838 429144 763360 0 9770 764650</p>
+<p>hd-idle的自己编译，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install build-essential fakeroot debhelper -y</span><br></pre></td></tr></table></figure>
+<p>获取源代码，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget http://sourceforge.net/projects/hd-idle/files/hd-idle-1.05.tgz</span><br></pre></td></tr></table></figure>
+<p>解压缩进入目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -xvf hd-idle-1.05.tgz &amp;&amp; cd hd-idle</span><br></pre></td></tr></table></figure>
+<p>编译安装，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dpkg-buildpackage -rfakeroot</span><br><span class="line">sudo dpkg -i ../hd-idle_*.deb</span><br></pre></td></tr></table></figure>
+<p>继续检查硬盘是否支持hd-idle,</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo hd-idle -i 0 -a sda -i 300 -d</span><br></pre></td></tr></table></figure>
+<p>你会看到如下输出：</p>
+<p>probing sda: reads: 13418, writes: 594344<br>probing sdb: reads: 146538, writes: 429152</p>
+<p>按 Ctrl+C 停止 hd-idle</p>
+<p>编辑配置文件，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim /etc/default/hd-idle</span><br></pre></td></tr></table></figure>
+<p>修改下面来开启hd-idle</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">START_HD_IDLE=true</span><br></pre></td></tr></table></figure>
+<p>调整空闲时间为10分钟 (60 秒 * 10)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HD_IDLE_OPTS=&quot;-i 0 -a sda -i 600&quot;</span><br></pre></td></tr></table></figure>
+<p>重启服务，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo service hd-idle restart</span><br></pre></td></tr></table></figure>
+<p>如果hd-idle也不支持，可以试下 sdparm</p>
+<h1 id="安装和配置-sdparm"><a href="#安装和配置-sdparm" class="headerlink" title="安装和配置 sdparm"></a>安装和配置 sdparm</h1><p>首先删除 hdparm 和 hd-idle</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get remove hdparm -y</span><br><span class="line">sudo dpkg -r hd-idle</span><br></pre></td></tr></table></figure>
+<p>安装 sdparm</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install sdparm -y</span><br></pre></td></tr></table></figure>
+<p>测试sdparm是否支持，停止一切硬盘操作，输入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sydo sdparm --flexible --command=stop /dev/sdb</span><br></pre></td></tr></table></figure>
+<p>应该可以看到如下输出，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/dev/sdb: SANHO     IUSBPORT          0</span><br></pre></td></tr></table></figure>
+<p>如果需要每隔10分钟休眠硬盘，可以用如下crontab命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo crontab -l | &#123; cat; echo &quot;/10 * * * * sdparm --command=stop /dev/sda&quot;; &#125; | sudo crontab -</span><br></pre></td></tr></table></figure>
+<p>经过以上折腾，终于可以放心了，不用担心硬盘一天24小时不要命的转。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://sg.danny.cz/sg/sdparm.html" target="_blank" rel="noopener">http://sg.danny.cz/sg/sdparm.html</a><br><a href="http://www.nslu2-linux.org/wiki/FAQ/SpinDownUSBHarddisks" target="_blank" rel="noopener">http://www.nslu2-linux.org/wiki/FAQ/SpinDownUSBHarddisks</a><br><a href="http://hd-idle.sourceforge.net/" target="_blank" rel="noopener">http://hd-idle.sourceforge.net/</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/12/10/12.【Linux】硬盘休眠/" data-id="cjq609ouj0001agkz7dzd0gou" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/12/27/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Hello World
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/12/03/11.【Tensorflow】卷积神经网络图片风格转化/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/12/27/13.【树莓派】搭建FM发射器/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/27/新的开始/">新的开始</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/27/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/10/12.【Linux】硬盘休眠/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/03/11.【Tensorflow】卷积神经网络图片风格转化/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

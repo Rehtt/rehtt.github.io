@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://yoursite.com/page/2/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:locale" content="default">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-5.【已发布】Dlib库安装" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/30/5.【已发布】Dlib库安装/" class="article-date">
+  <time datetime="2018-09-30T06:30:44.776Z" itemprop="datePublished">2018-09-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="安装环境"><a href="#安装环境" class="headerlink" title="安装环境"></a>安装环境</h2><h3 id="Windows"><a href="#Windows" class="headerlink" title="Windows"></a>Windows</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pip install opencv-python</span><br><span class="line"></span><br><span class="line">pip install dlib==19.8.1</span><br></pre></td></tr></table></figure>
+<p>目前19.8.1及之前的版本支持.whl免编译安装，如果要安装最新版则需要采用编译安装的方式：</p>
+<ol>
+<li>确保有安装Visual Studio，因为boost在Windows下需要使用Visual Studio的组件编译安装。</li>
+<li>下载boost源文件解压后双击bootstrap.bat，在同目录下会生成b2.exe与bjam.exe两个文件。</li>
+<li>命令输入</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bjam install --toolset=msvc-10.0 architecture=x86 address-model=64 --build-type=complete --prefix="E:\boost_1_64_0\boost_1_64_0\bin\vc10_x64" link=static runtime-link=shared threading=multi debug release</span><br></pre></td></tr></table></figure>
+<p>进行编译安装</p>
+<p>参数解释：</p>
+<ul>
+<li>link=shared    可以生成dll。  （.\bjam.exe link=shared)</li>
+<li><ul>
+<li>toolset=msvc-14.1 即VS2017    (我用的vs2017)                    </li>
+<li><p>toolset=msvc-12.0 即VS2013                   </p>
+</li>
+<li><p>toolset=msvc-10.0 即VS2010                   </p>
+</li>
+<li><p>toolset=msvc-9.0  即VS2008 </p>
+</li>
+</ul>
+</li>
+<li>–with-xxxx                             如果你要编 chrono，就用  –with-chrono     </li>
+<li>–stagedir=”./vc2017”            自己设定一个输出目录  </li>
+<li>address-model=64                 设定32或者64位模式</li>
+</ul>
+<ol start="4">
+<li><p>下载安装CMake</p>
+</li>
+<li><p>编译安装Dlib</p>
+</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install dlib</span><br></pre></td></tr></table></figure>
+<h3 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install cmake boost-dev</span><br><span class="line">pip install opencv-python</span><br><span class="line">pip install dlib</span><br></pre></td></tr></table></figure>
+<h3 id="Mac"><a href="#Mac" class="headerlink" title="Mac"></a>Mac</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">brew install cmake brew install boost brew install boost-python --with-python3</span><br><span class="line"></span><br><span class="line">pip install opencv-python</span><br><span class="line"></span><br><span class="line">pip install dlib</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/30/5.【已发布】Dlib库安装/" data-id="cjq609ouq0006agkzluoq694g" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-4.【Linux】mysql服务安装" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/19/4.【Linux】mysql服务安装/" class="article-date">
+  <time datetime="2018-09-19T07:51:43.606Z" itemprop="datePublished">2018-09-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="0x00-安装"><a href="#0x00-安装" class="headerlink" title="0x00 安装"></a>0x00 安装</h1><p>终端输入</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> sudo apt install -y mysql-server</span><br></pre></td></tr></table></figure>
+<h1 id="0x01-设置root密码"><a href="#0x01-设置root密码" class="headerlink" title="0x01 设置root密码"></a>0x01 设置root密码</h1><p>安装完后root默认是没有密码的，但可以使用系统root权限免密码进入数据库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo mysql -u root</span><br></pre></td></tr></table></figure>
+<p>进入后</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">use mysql;</span><br><span class="line">update user set plugin=&apos;mysql_native_password&apos; where user=&apos;root&apos;;</span><br><span class="line">update user set password=password(&apos;密码&apos;) where user=&apos;root&apos;;</span><br><span class="line">flush privileges;</span><br><span class="line">exit;</span><br></pre></td></tr></table></figure>
+<p>重启数据库</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo service mysql restart</span><br></pre></td></tr></table></figure>
+<h1 id="0x02-开启远程访问"><a href="#0x02-开启远程访问" class="headerlink" title="0x02 开启远程访问"></a>0x02 开启远程访问</h1><p>修改配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf</span><br><span class="line">将 bind-address 127.0.0.1 注释掉</span><br><span class="line"></span><br><span class="line">$ sudo service mysql restart</span><br></pre></td></tr></table></figure>
+<p>进入数据库设置远程登录操作</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">use mysql;</span><br><span class="line">grant all privileges on *.* to &apos;root&apos;@&apos;%&apos; identified by &apos;root账户密码&apos; with grant option;</span><br><span class="line">flush privileges;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/19/4.【Linux】mysql服务安装/" data-id="cjq609ouo0004agkzakymbvuj" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-3.【Golang】命令行传递参数" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/13/3.【Golang】命令行传递参数/" class="article-date">
+  <time datetime="2018-09-13T10:46:10.187Z" itemprop="datePublished">2018-09-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="0x00-命令行参数的使用"><a href="#0x00-命令行参数的使用" class="headerlink" title="0x00 命令行参数的使用"></a>0x00 命令行参数的使用</h1><p>Go的命令行参数储存在切片os.Args中</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i,s := <span class="keyword">range</span> os.Args&#123;</span><br><span class="line">    fmt.Println(<span class="string">"Args[%d]=%s"</span>,i,s)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="0x01-flag包对命令行参数解析"><a href="#0x01-flag包对命令行参数解析" class="headerlink" title="0x01 flag包对命令行参数解析"></a>0x01 flag包对命令行参数解析</h1><p>flag包</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flag.Type(<span class="string">"Flag Name"</span>,Default Value,<span class="string">"Help Message"</span>) *Tpye</span><br></pre></td></tr></table></figure>
+<p>使用实例：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> i = flag.Int(<span class="string">"i"</span> , <span class="number">1</span> ,<span class="string">"number"</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    flag.Pares()</span><br><span class="line">    fmt.Println(*n)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>./main -h</span><br><span class="line">Usage of ./main:</span><br><span class="line">  -h int</span><br><span class="line">        number (default 1)</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>./main -i 1234</span><br><span class="line">1234</span><br></pre></td></tr></table></figure>
+<h1 id="0x02-cmd输入"><a href="#0x02-cmd输入" class="headerlink" title="0x02 cmd输入"></a>0x02 cmd输入</h1><p>窗口停留等待输入</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> i <span class="keyword">string</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    fmt.Scanln(&amp;i)</span><br><span class="line">    fmt.Println(i)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/13/3.【Golang】命令行传递参数/" data-id="cjq609oup0005agkzatscof3j" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2.【Golang】所遇问题及解答" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/13/2.【Golang】所遇问题及解答/" class="article-date">
+  <time datetime="2018-09-13T04:46:31.169Z" itemprop="datePublished">2018-09-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ul>
+<li style="list-style: none"><input type="checkbox" checked> #### 0x00.Respones.Body只能读一遍</li>
+</ul>
+<p>因为我采用ioutil.ReadAll读取Respones.Body，所以后来发现再次读取Respones.Body发现是空的。这是因为Body会标记读取位置，ReadAll会读取到末尾，因此第二次就会读不到数据。</p>
+<p>解决方法：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">res, _ := ioutil.ReadAll(respones.Body)</span><br><span class="line"></span><br><span class="line">respones.Body.Close()</span><br><span class="line">respones.Body = ioutil.NopCloser(bytes.NewBuffer(res))</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/13/2.【Golang】所遇问题及解答/" data-id="cjq609ov2000dagkzc382emgs" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-1.【已发布】使用Python驱动SSD1306 OLED显示" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/11/1.【已发布】使用Python驱动SSD1306 OLED显示/" class="article-date">
+  <time datetime="2018-09-11T09:43:54.148Z" itemprop="datePublished">2018-09-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="0x00"><a href="#0x00" class="headerlink" title="0x00"></a>0x00</h1><p>因为之前用的Nokia5110显示有故障，所以在网友的推荐下接触到了SSD1306。</p>
+<blockquote>
+<p>显示模块型号：SSD1306 OLED</p>
+<p>显示范围：单色 128*64点阵</p>
+<p>测试机：树莓派zero w</p>
+<p>测试机系统：<a href="https://www.raspberrypi.org/downloads/raspbian/" target="_blank" rel="noopener">Raspbian stretch life</a></p>
+<p>开发语言：Python3</p>
+<p>采用驱动库：<a href="https://github.com/adafruit/Adafruit_Python_SSD1306" target="_blank" rel="noopener">Adafruit Python SSD1306</a></p>
+</blockquote>
+<h1 id="0x01环境准备"><a href="#0x01环境准备" class="headerlink" title="0x01环境准备"></a>0x01环境准备</h1><h2 id="1-树莓派开启I2C接口"><a href="#1-树莓派开启I2C接口" class="headerlink" title="1.树莓派开启I2C接口"></a>1.树莓派开启I2C接口</h2><p>终端输入</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo raspi-config</span><br></pre></td></tr></table></figure>
+<p>选择<code>Interfacing Options</code>，开启<code>I2C</code>接口</p>
+<p><img src="D:\documents\博客\image\1\Lily_Screenshot_1536654250.png" alt="Lily_Screenshot_1536654250"></p>
+<p><img src="D:\documents\博客\image\1\Lily_Screenshot_1536654260.png" alt="Lily_Screenshot_1536654260"></p>
+<p><img src="D:\documents\博客\image\1\Lily_Screenshot_1536654272.png" alt="Lily_Screenshot_1536654272"></p>
+<h2 id="2-接线"><a href="#2-接线" class="headerlink" title="2.接线"></a>2.接线</h2><p>模块共4针脚，接线为</p>
+<blockquote>
+<p>VCC        1</p>
+<p>GND    6</p>
+<p>SCL        5</p>
+<p>SDA        3</p>
+</blockquote>
+<p><img src="D:\documents\博客\image\1\Lily_Screenshot_1536654018.png" alt="Lily_Screenshot_1536654018"></p>
+<h2 id="3-驱动"><a href="#3-驱动" class="headerlink" title="3.驱动"></a>3.驱动</h2><p>GPIO驱动：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install Adafruit_GPIO</span><br></pre></td></tr></table></figure>
+<p>SSD1306采用的驱动是<a href="https://github.com/adafruit/Adafruit_Python_SSD1306" target="_blank" rel="noopener">Adafruit Python SSD1306</a>，用pip安装即可。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo python -m pip install --upgrade pip setuptools wheel</span><br><span class="line">sudo pip install Adafruit-SSD1306</span><br></pre></td></tr></table></figure>
+<p>或者采用python文件安装：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo python -m pip install --upgrade pip setuptools wheel</span><br><span class="line">git clone https://github.com/adafruit/Adafruit_Python_SSD1306.git</span><br><span class="line">cd Adafruit_Python_SSD1306</span><br><span class="line">sudo python setup.py install</span><br></pre></td></tr></table></figure>
+<h1 id="0x03使用"><a href="#0x03使用" class="headerlink" title="0x03使用"></a>0x03使用</h1><p>采用python文件安装的可以在<code>Adafruit_Python_SSD1306</code>文件夹中看见<code>examples</code>实例文件夹。</p>
+<p>首先是导入驱动的库：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Adafruit_GPIO.SPI <span class="keyword">as</span> SPI</span><br><span class="line"><span class="keyword">import</span> Adafruit_SSD1306</span><br></pre></td></tr></table></figure>
+<p>针脚配置：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Raspberry Pi pin configuration:</span></span><br><span class="line">RST = <span class="number">24</span></span><br><span class="line"><span class="comment"># Note the following are only used with SPI:</span></span><br><span class="line">DC = <span class="number">23</span></span><br><span class="line">SPI_PORT = <span class="number">0</span></span><br><span class="line">SPI_DEVICE = <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>显示配置：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#分辨率选择一个即可</span></span><br><span class="line"><span class="comment"># 128x32</span></span><br><span class="line">disp = Adafruit_SSD1306.SSD1306_128_32(rst=RST)</span><br><span class="line"><span class="comment"># 128x64</span></span><br><span class="line">disp = Adafruit_SSD1306.SSD1306_128_64(rst=RST)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化库</span></span><br><span class="line">disp.begin()</span><br><span class="line"><span class="comment"># 获取屏幕大小</span></span><br><span class="line">width = disp.width</span><br><span class="line">height = disp.height</span><br><span class="line"><span class="comment"># 清除屏幕内容</span></span><br><span class="line">disp.clear()</span><br><span class="line">disp.display()</span><br></pre></td></tr></table></figure>
+<h2 id="1-显示内容"><a href="#1-显示内容" class="headerlink" title="1.显示内容"></a>1.显示内容</h2><p>屏幕显示内容是先建立一张与屏幕相等的空白画布，将要显示的内容添加到其中，最后再显示出来：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建空白画布</span></span><br><span class="line"><span class="comment"># 颜色为1 bit</span></span><br><span class="line">width = disp.width</span><br><span class="line">height = disp.height</span><br><span class="line">image = Image.new(<span class="string">'1'</span>, (width, height))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 画布绘制对象</span></span><br><span class="line">draw = ImageDraw.Draw(image)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制一个黑色内容清除画布内容</span></span><br><span class="line">draw.rectangle((<span class="number">0</span>,<span class="number">0</span>,width,height), outline=<span class="number">0</span>, fill=<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制内容</span></span><br><span class="line"><span class="comment"># 定义一些常亮控制图形大小</span></span><br><span class="line">padding = <span class="number">2</span></span><br><span class="line">shape_width = <span class="number">20</span></span><br><span class="line">top = padding</span><br><span class="line">bottom = height-padding</span><br><span class="line"><span class="comment"># 从左向右移动，跟踪绘制形状的当前位置</span></span><br><span class="line">x = padding</span><br><span class="line"><span class="comment"># 绘制椭圆</span></span><br><span class="line">draw.ellipse((x, top , x+shape_width, bottom), outline=<span class="number">255</span>, fill=<span class="number">0</span>)</span><br><span class="line">x += shape_width+padding</span><br><span class="line"><span class="comment"># 绘制矩形</span></span><br><span class="line">draw.rectangle((x, top, x+shape_width, bottom), outline=<span class="number">255</span>, fill=<span class="number">0</span>)</span><br><span class="line">x += shape_width+padding</span><br><span class="line"><span class="comment"># 绘制三角</span></span><br><span class="line">draw.polygon([(x, bottom), (x+shape_width/<span class="number">2</span>, top), (x+shape_width, bottom)], outline=<span class="number">255</span>, fill=<span class="number">0</span>)</span><br><span class="line">x += shape_width+padding</span><br><span class="line"><span class="comment"># 绘制X</span></span><br><span class="line">draw.line((x, bottom, x+shape_width, top), fill=<span class="number">255</span>)</span><br><span class="line">draw.line((x, top, x+shape_width, bottom), fill=<span class="number">255</span>)</span><br><span class="line">x += shape_width+padding</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加载默认字体</span></span><br><span class="line">font = ImageFont.load_default()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 或者使用其他.ttf格式的字体，字体文件要与执行文件在同一目录</span></span><br><span class="line"><span class="comment">#font = ImageFont.truetype('Minecraftia.ttf', 8)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 加两行文字</span></span><br><span class="line">draw.text((x, top),    <span class="string">'Hello'</span>,  font=font, fill=<span class="number">255</span>)</span><br><span class="line">draw.text((x, top+<span class="number">20</span>), <span class="string">'World!'</span>, font=font, fill=<span class="number">255</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 显示</span></span><br><span class="line">disp.image(image)</span><br><span class="line">disp.display()</span><br></pre></td></tr></table></figure>
+<p><img src="D:\documents\博客\image\1\617739217782034705.jpg" alt="617739217782034705"></p>
+<h2 id="2-显示图片"><a href="#2-显示图片" class="headerlink" title="2.显示图片"></a>2.显示图片</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 根据OLED高度加载图片，图片要转换成1 bit颜色</span></span><br><span class="line"><span class="keyword">if</span> disp.height == <span class="number">64</span>:</span><br><span class="line">    image = Image.open(<span class="string">'image_64.png'</span>).convert(<span class="string">'1'</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    image = Image.open(<span class="string">'image_32.png'</span>).convert(<span class="string">'1'</span>)</span><br></pre></td></tr></table></figure>
+<p><img src="D:\documents\博客\image\1\46229923031718465.jpg" alt="46229923031718465"></p>
+<p><em>PS:可以把喜欢的图片改成不超过128\</em>64，再在Photoshop里先把模式改成灰度，然后调对比度和亮度，在不影响视觉的前提下尽可能对比度大。然后再改模式为“位图”，方法选“扩散仿色”，然后另存为PNG，选项为交错，就可以让OLED显示了。*</p>
+<p><strong>END</strong></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2018/09/11/1.【已发布】使用Python驱动SSD1306 OLED显示/" data-id="cjq609ou60000agkz6y83s51c" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/12/27/13.【树莓派】搭建FM发射器/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/27/新的开始/">新的开始</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/27/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/10/12.【Linux】硬盘休眠/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2018/12/03/11.【Tensorflow】卷积神经网络图片风格转化/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
